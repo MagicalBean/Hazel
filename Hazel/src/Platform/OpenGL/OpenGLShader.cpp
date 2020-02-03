@@ -6,15 +6,14 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-namespace Hazel
-{
+namespace Hazel {
+
 	static GLenum ShaderTypeFromString(const std::string& type)
 	{
-		if (type == "vertex") 
+		if (type == "vertex")
 			return GL_VERTEX_SHADER;
-		if (type == "fragment" || type == "pixel") 
+		if (type == "fragment" || type == "pixel")
 			return GL_FRAGMENT_SHADER;
-
 
 		HZ_CORE_ASSERT(false, "Unknown shader type!");
 		return 0;
@@ -37,9 +36,17 @@ namespace Hazel
 		std::string source = ReadFile(filepath);
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
+
+		// Extract name from filepath
+		auto lastSlash = filepath.find_last_of("/\\");
+		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
+		auto lastDot = filepath.rfind('.');
+		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
+		m_Name = filepath.substr(lastSlash, count);
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc)
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+		: m_Name(name)
 	{
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
@@ -49,12 +56,10 @@ namespace Hazel
 
 	OpenGLShader::~OpenGLShader()
 	{
-		glDeleteProgram(0);
+		glDeleteProgram(m_RendererID);
 	}
 
-
-
-	std::string OpenGLShader::ReadFile(const std::string filepath)
+	std::string OpenGLShader::ReadFile(const std::string& filepath)
 	{
 		std::string result;
 		std::ifstream in(filepath, std::ios::in | std::ios::binary);
@@ -65,6 +70,7 @@ namespace Hazel
 			in.seekg(0, std::ios::beg);
 			in.read(&result[0], result.size());
 			in.close();
+			;
 		}
 		else
 		{
@@ -77,7 +83,7 @@ namespace Hazel
 	std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source)
 	{
 		std::unordered_map<GLenum, std::string> shaderSources;
-		
+
 		const char* typeToken = "#type";
 		size_t typeTokenLength = strlen(typeToken);
 		size_t pos = source.find(typeToken, 0);
@@ -100,7 +106,7 @@ namespace Hazel
 	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
 		GLuint program = glCreateProgram();
-		HZ_CORE_ASSERT(shaderSources.size() <= 2, "Only 2 shaders are supported");
+		HZ_CORE_ASSERT(shaderSources.size() <= 2, "We only support 2 shaders for now");
 		std::array<GLenum, 2> glShaderIDs;
 		int glShaderIDIndex = 0;
 		for (auto& kv : shaderSources)
@@ -128,7 +134,7 @@ namespace Hazel
 				glDeleteShader(shader);
 
 				HZ_CORE_ERROR("{0}", infoLog.data());
-				HZ_CORE_ASSERT(false, StringFromShaderType(type) + " shader compilation failture!");
+				HZ_CORE_ASSERT(false, "Shader compilation failure!");
 				break;
 			}
 
@@ -136,8 +142,12 @@ namespace Hazel
 			glShaderIDs[glShaderIDIndex++] = shader;
 		}
 
+		m_RendererID = program;
+
+		// Link our program
 		glLinkProgram(program);
 
+		// Note the different functions here: glGetProgram* instead of glGetShader*.
 		GLint isLinked = 0;
 		glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked);
 		if (isLinked == GL_FALSE)
@@ -145,23 +155,23 @@ namespace Hazel
 			GLint maxLength = 0;
 			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
 
+			// The maxLength includes the NULL character
 			std::vector<GLchar> infoLog(maxLength);
 			glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
 
+			// We don't need the program anymore.
 			glDeleteProgram(program);
 
 			for (auto id : glShaderIDs)
 				glDeleteShader(id);
 
 			HZ_CORE_ERROR("{0}", infoLog.data());
-			HZ_CORE_ASSERT(false, "Shader link failture!");
+			HZ_CORE_ASSERT(false, "Shader link failure!");
 			return;
 		}
 
 		for (auto id : glShaderIDs)
 			glDetachShader(program, id);
-
-		m_RendererID = program;
 	}
 
 	void OpenGLShader::Bind() const
@@ -173,8 +183,6 @@ namespace Hazel
 	{
 		glUseProgram(0);
 	}
-
-#pragma region UniformUploaders
 
 	void OpenGLShader::UploadUniformInt(const std::string& name, int value)
 	{
@@ -188,22 +196,22 @@ namespace Hazel
 		glUniform1f(location, value);
 	}
 
-	void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& values)
+	void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform2f(location, values.x, values.y);
+		glUniform2f(location, value.x, value.y);
 	}
 
-	void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& values)
+	void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform3f(location, values.x, values.y, values.z);
+		glUniform3f(location, value.x, value.y, value.z);
 	}
 
-	void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& values)
+	void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform4f(location, values.x, values.y, values.z, values.w);
+		glUniform4f(location, value.x, value.y, value.z, value.w);
 	}
 
 	void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix)
@@ -217,5 +225,5 @@ namespace Hazel
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
-#pragma endregion
+
 }
