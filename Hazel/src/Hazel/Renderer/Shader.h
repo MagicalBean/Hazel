@@ -5,8 +5,8 @@
 
 #include <glm/glm.hpp>
 
-namespace Hazel
-{
+namespace Hazel {
+
 	class Shader
 	{
 	public:
@@ -40,4 +40,5 @@ namespace Hazel
 	private:
 		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
 	};
+
 }

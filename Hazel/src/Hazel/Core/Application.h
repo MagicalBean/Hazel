@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Core.h"
+#include "Hazel/Core/Core.h"
 
-#include "Window.h"
+#include "Hazel/Core/Window.h"
 #include "Hazel/Core/LayerStack.h"
 #include "Hazel/Events/Event.h"
 #include "Hazel/Events/ApplicationEvent.h"
@@ -13,7 +13,7 @@
 
 namespace Hazel {
 
-	class HAZEL_API Application
+	class Application
 	{
 	public:
 		Application();
@@ -27,7 +27,7 @@ namespace Hazel {
 		void PushOverlay(Layer* layer);
 
 		inline Window& GetWindow() { return *m_Window; }
-		
+
 		inline static Application& Get() { return *s_Instance; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
@@ -46,3 +46,4 @@ namespace Hazel {
 	// To be defined in CLIENT
 	Application* CreateApplication();
 }
+
