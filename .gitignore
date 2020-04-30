@@ -11,5 +11,4 @@ bin-int/
 **.sln
 **.vcxproj
 **.vcxproj.filters
-**.vcxproj.user 
-Sandbox/imgui.ini
+**.vcxproj.user
