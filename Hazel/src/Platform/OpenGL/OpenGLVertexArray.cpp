@@ -107,7 +107,7 @@ namespace Hazel {
 					break;
 				}
 				default:
-					HZ_CORE_ASSERT(false, "Unknown ShaderDataType!")
+					HZ_CORE_ASSERT(false, "Unknown ShaderDataType!");
 			}
 		}
 		m_VertexBuffers.push_back(vertexBuffer);
