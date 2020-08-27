@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "Hazel/Renderer/Camera.h"
 #include "SceneCamera.h"
+#include "ScriptableEntity.h"
 
 namespace Hazel {
 
@@ -23,7 +23,7 @@ namespace Hazel {
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
-		TransformComponent(const glm::mat4 & transform)
+		TransformComponent(const glm::mat4& transform)
 			: Transform(transform) {}
 
 		operator glm::mat4& () { return Transform; }
@@ -49,5 +49,20 @@ namespace Hazel {
 
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
+	};
+
+	struct NativeScriptComponent
+	{
+		ScriptableEntity* Instance = nullptr;
+
+		ScriptableEntity* (*InstantiateScript)();
+		void (*DestoryScript)(NativeScriptComponent*);
+
+		template<typename T>
+		void Bind()
+		{
+			InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
+			DestoryScript = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
+		}
 	};
 }
