@@ -85,14 +85,12 @@ namespace Hazel {
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 		m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 #endif
-
 		m_SceneHeirarchyPanel.SetContext(m_ActiveScene);
 	}
 	
 	void EditorLayer::OnDetach()
 	{
 		HZ_PROFILE_FUNCTION();
-
 	}
 
 	void EditorLayer::OnUpdate(Timestep ts)
@@ -141,7 +139,7 @@ namespace Hazel {
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
 			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-			HZ_CORE_WARN("Pixel Data = {0}", pixelData);
+			m_HoveredEntity = pixelData == -1 ? Entity() : Entity( (entt::entity)pixelData, m_ActiveScene.get() );
 		}
 
 		m_Framebuffer->Unbind();
@@ -228,6 +226,11 @@ namespace Hazel {
 		m_SceneHeirarchyPanel.OnImGuiRender();
 
 		ImGui::Begin("Stats");
+
+		std::string name = "None";
+		if (m_HoveredEntity)
+			name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
+		ImGui::Text("Hovered Entity: %s", name.c_str());
 
 		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
