@@ -13,7 +13,6 @@
 
 #include <ImGuizmo.h>
 
-
 namespace Hazel {
 
 	ImGuiLayer::ImGuiLayer()
