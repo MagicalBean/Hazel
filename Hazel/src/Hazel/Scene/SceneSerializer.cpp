@@ -5,6 +5,7 @@
 #include "Components.h"
 
 #include <fstream>
+
 #include <yaml-cpp/yaml.h> 
 
 namespace YAML {
@@ -153,7 +154,7 @@ namespace Hazel {
 		out << YAML::EndMap; // Entity
 	}
 
-	void SceneSerializer::Seralize(const std::string& filepath)
+	void SceneSerializer::Serialize(const std::string& filepath)
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap;
@@ -179,7 +180,7 @@ namespace Hazel {
 		HZ_CORE_ASSERT(false, "Not implemented");
 	}
 
-	bool SceneSerializer::Deseralize(const std::string& filepath)
+	bool SceneSerializer::Deserialize(const std::string& filepath)
 	{
 		YAML::Node data = YAML::LoadFile(filepath);
 		if (!data["Scene"])

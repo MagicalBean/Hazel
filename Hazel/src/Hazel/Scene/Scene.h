@@ -32,6 +32,6 @@ namespace Hazel {
 
 		friend class Entity;
 		friend class SceneSerializer;
-		friend class SceneHeirarchyPanel;
+		friend class SceneHierarchyPanel;
 	};
 }

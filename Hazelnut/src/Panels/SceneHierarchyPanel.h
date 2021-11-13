@@ -1,17 +1,16 @@
 #pragma once
 
 #include "Hazel/Core/Base.h"
-#include "Hazel/Core/Log.h"
 #include "Hazel/Scene/Scene.h"
 #include "Hazel/Scene/Entity.h"
 
 namespace Hazel {
 
-	class SceneHeirarchyPanel
+	class SceneHierarchyPanel
 	{
 	public:
-		SceneHeirarchyPanel() = default;
-		SceneHeirarchyPanel(const Ref<Scene>& scene);
+		SceneHierarchyPanel() = default;
+		SceneHierarchyPanel(const Ref<Scene>& scene);
 
 		void SetContext(const Ref<Scene>& scene);
 

@@ -2,6 +2,7 @@
 
 #include "Hazel.h"
 #include "Panels/SceneHierarchyPanel.h"
+#include "Panels/ContentBrowserPanel.h"
 
 #include "Hazel/Renderer/EditorCamera.h"
 
@@ -25,7 +26,14 @@ namespace Hazel {
 
 		void NewScene();
 		void OpenScene();
+		void OpenScene(const std::filesystem::path& path);
 		void SaveSceneAs();
+
+		void OnScenePlay();
+		void OnSceneStop();
+
+		// UI Panels
+		void UI_Toolbar();
 	private:
 		OrthographicCameraController m_CameraController;
 
@@ -54,9 +62,19 @@ namespace Hazel {
 
 		glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 		
-		int m_GizmoType = -1;
+		int m_GizmoType = 0;
+
+		enum class SceneState
+		{
+			Edit = 0, Play = 1
+		};
+		SceneState m_SceneState = SceneState::Edit;
 
 		// Panels
-		SceneHeirarchyPanel m_SceneHeirarchyPanel;
+		SceneHierarchyPanel m_SceneHierarchyPanel;
+		ContentBrowserPanel m_ContentBrowserPanel;
+
+		// Editor Resources
+		Ref<Texture2D> m_IconPlay, m_IconStop;
 	};
 }
