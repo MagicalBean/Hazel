@@ -27,7 +27,7 @@ namespace Hazel {
 
 		void NewScene();
 		void OpenScene();
-		void OpenScene(const std::filesystem::path& path);
+		bool OpenScene(const std::filesystem::path& path);
 		void SaveScene();
 		void SaveSceneAs();
 
@@ -35,6 +35,9 @@ namespace Hazel {
 
 		void OnScenePlay();
 		void OnSceneStop();
+
+		void SetActiveScene(const Ref<Scene>& activeScene);
+		void SyncWindowTitle();
 
 		void OnDuplicateEntity();
 

@@ -35,6 +35,9 @@ namespace Hazel {
 
 		Entity GetPrimaryCameraEntity();
 
+		void SetName(const std::string& name);
+		const std::string& GetName() const { return m_Name; }
+
 		template<typename... Components>
 		auto GetAllEntitiesWith()
 		{
@@ -46,6 +49,8 @@ namespace Hazel {
 	private:
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+
+		std::string m_Name = "Untitled";
 
 		b2World* m_PhysicsWorld = nullptr;
 
