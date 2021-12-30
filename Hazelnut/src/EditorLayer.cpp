@@ -1,16 +1,14 @@
 #include "EditorLayer.h"
+
+#include "Hazel/Scene/SceneSerializer.h"
+#include "Hazel/Utils/PlatformUtils.h"
+#include "Hazel/Math/Math.h"
+
 #include <imgui/imgui.h>
+#include "ImGuizmo.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-#include "Hazel/Scene/SceneSerializer.h"
-
-#include "Hazel/Utils/PlatformUtils.h"
-
-#include "ImGuizmo.h"
-
-#include "Hazel/Math/Math.h"
 
 namespace Hazel {
 
@@ -523,11 +521,24 @@ namespace Hazel {
 			// Circle Colliders
 			{
 				auto view = m_ActiveScene->GetAllEntitiesWith<TransformComponent, CircleCollider2DComponent>();
+				
+				// Calculate z index for translation
+				float zIndex = 0.001f;
+				glm::vec3 cameraForwardDirection;
+				if (m_SceneState == SceneState::Edit)
+					cameraForwardDirection = m_EditorCamera.GetForwardDirection();
+				else
+				{
+					cameraForwardDirection = glm::vec3(0.0f, 0.0f, -1.0f);
+					//cameraForwardDirection = m_ActiveScene->GetPrimaryCameraEntity().GetComponent<CameraComponent>().Camera.GetForwardDirection();
+				}
+				glm::vec3 projectionCollider = cameraForwardDirection * glm::vec3(zIndex);
+				
 				for (auto entity : view)
 				{
 					auto [tc, cc2d] = view.get<TransformComponent, CircleCollider2DComponent>(entity);
 
-					glm::vec3 translation = tc.Translation + glm::vec3(cc2d.Offset, 0.001f);
+					glm::vec3 translation = tc.Translation + glm::vec3(cc2d.Offset, -projectionCollider.z);
 					glm::vec3 scale = tc.Scale * glm::vec3(cc2d.Radius * 2.0f);
 
 					glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)

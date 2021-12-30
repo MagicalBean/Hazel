@@ -1,5 +1,7 @@
 #include "hzpch.h"
+
 #include "Platform/OpenGL/OpenGLShader.h"
+#include "Hazel/Core/Timer.h"
 
 #include <filesystem>
 
@@ -11,8 +13,6 @@
 #include <shaderc/shaderc.hpp>
 #include <spirv_cross/spirv_cross.hpp>
 #include <spirv_cross/spirv_glsl.hpp>
-
-#include "Hazel/Core/Timer.h"
 
 namespace Hazel {
 

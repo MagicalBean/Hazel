@@ -1,11 +1,12 @@
 #include "SceneHierarchyPanel.h"
 
+#include "Hazel/Scene/Components.h"
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Hazel/Scene/Components.h"
 #include <cstring>
 
 #include <filesystem>
